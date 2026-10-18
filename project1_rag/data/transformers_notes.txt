@@ -1,0 +1,79 @@
+## 1. Introduction to Transformers
+
+- Introduced in the 2017 paper "Attention Is All You Need" by Vaswani et al.
+
+- Replaced Recurrent Neural Networks (RNNs) and LSTMs for sequence-to-sequence tasks.
+
+- Core innovation: Completely relies on **self-attention mechanisms** to compute representations of input and output without using sequence-aligned RNNs or convolutions.
+
+- Highly parallelizable, making it suitable for training on massive modern hardware (GPUs/TPUs).
+
+
+
+---
+
+
+
+## 2. Core Components of the Transformer Architecture
+
+
+
+### A. Tokenization & Embeddings
+
+- **Tokenization:** Breaking raw text into subwords (e.g., using Byte-Pair Encoding or WordPiece) so models can handle unseen words gracefully.
+
+- **Input Embeddings:** Converting token IDs into dense vectors of dimension $d_{\text{model}}$ (e.g., 768, 4096).
+
+- **Positional Encodings:** Because Transformers process all tokens simultaneously (lacking sequential recurrence), positional encodings (sinusoidal or learned) are added to token embeddings to preserve word order information.
+
+
+
+### B. Scaled Dot-Product Attention
+
+- The fundamental building block of attention.
+
+- Calculated using Queries ($Q$), Keys ($K$), and Values ($V$):
+
+  $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+- **$d_k$:** Scaling factor (dimension of the keys) to prevent gradients from vanishing or exploding in the softmax function for large dimensions.
+
+
+
+### C. Multi-Head Attention
+
+- Instead of performing a single attention function, the queries, keys, and values are projected $h$ times with different, learned linear projections.
+
+- Allows the model to jointly attend to information from different representation subspaces at different positions.
+
+
+
+### D. Encoder-Decoder Structure (Original Architecture)
+
+- **Encoder:** Maps an input sequence of symbol representations to a sequence of continuous representations. Composed of alternating multi-head self-attention and position-wise fully connected feed-forward layers.
+
+- **Decoder:** Generates an output sequence one element at a time, utilizing masked self-attention (to prevent looking into future tokens) and encoder-decoder cross-attention.
+
+
+
+---
+
+
+
+## 3. Transformer Variants & Their Role in RAG
+
+
+
+### A. Encoder-Only Models (e.g., BERT, RoBERTa)
+
+- **Characteristics:** Bidirectional context, trained via Masked Language Modeling (MLM).
+
+- **RAG Use Case:** Excellent for **Embeddings** and **Cross-Encoders (Rerankers)**. Used to encode documents and queries into dense vector spaces for semantic vector search (e.g., in vector databases like FAISS, Chroma, Pinecone).
+
+
+
+### B. Decoder-Only Models (e.g., GPT-4, Llama 3, Mistral)
+
+- **Characteristics:** Autoregressive, unidirectional, trained on Causal Language Modeling (CLM).
+
+- **RAG Use Case:** Acting as the **Generator** component in RAG. They take the retrieved context passages along with the user prompt to synthesize a coherent, grounded final response.

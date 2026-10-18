@@ -1,0 +1,9 @@
+# vector database
+chroma_db/
+
+# pycache
+__pycache__/
+
+# virtual environment
+venv/
+.env
